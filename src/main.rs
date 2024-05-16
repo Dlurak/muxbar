@@ -1,5 +1,6 @@
 mod colors;
 mod config;
+mod icons;
 mod modules;
 
 fn main() {

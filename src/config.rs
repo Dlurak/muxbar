@@ -1,9 +1,11 @@
 use crate::colors::{Color, Style};
+use crate::icons::Icon;
 use crate::modules::{styled::StyledModule, Module};
 
 pub fn get_modules() -> Vec<StyledModule> {
     vec![StyledModule::new(
         Module::Time("%Y-%m-%d %H:%M:%S"),
+        Some(Icon::Time),
         Style::new(Color::Green, Color::Reset),
     )]
 }
