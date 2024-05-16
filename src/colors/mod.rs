@@ -13,24 +13,28 @@ pub enum Color {
 }
 
 pub struct Style {
-    fg: Color,
-    bg: Color,
+    pub fg: Color,
+    pub bg: Color,
+
+    pub bold: bool,
 }
 
 impl Style {
-    pub fn new(fg: Color, bg: Color) -> Self {
-        Self { fg, bg }
-    }
-
     pub fn default() -> Self {
         Self {
             fg: Color::Reset,
             bg: Color::Reset,
+            bold: false,
         }
     }
 
     pub fn display(self) -> String {
-        format!("{}{}", foreground_color(self.fg), background_color(self.bg))
+        format!(
+            "{}{}{}",
+            foreground_color(self.fg),
+            background_color(self.bg),
+            bold(self.bold),
+        )
     }
 }
 
@@ -59,5 +63,13 @@ pub fn background_color(color: Color) -> &'static str {
         Color::Cyan => "#[bg=cyan]",
         Color::Magenta => "#[bg=magenta]",
         Color::Reset => "#[bg=default]",
+    }
+}
+
+fn bold(is_bold: bool) -> &'static str {
+    if is_bold {
+        "#[bold]"
+    } else {
+        "#[nobold]"
     }
 }

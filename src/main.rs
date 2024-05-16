@@ -2,6 +2,7 @@ mod colors;
 mod config;
 mod icons;
 mod modules;
+mod utils;
 
 fn main() {
     let modules = config::get_modules();

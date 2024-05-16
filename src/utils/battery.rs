@@ -8,5 +8,6 @@ pub fn battery_status() -> Result<u8, ()> {
     let percentages = battery
         .state_of_charge()
         .get::<battery::units::ratio::percent>() as u8;
+
     Ok(percentages)
 }
