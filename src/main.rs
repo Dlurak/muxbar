@@ -8,7 +8,7 @@ fn main() {
 
     let strings = modules
         .into_iter()
-        .map(|styled_mod| styled_mod.display())
+        .filter_map(|styled_mod| styled_mod.display().ok())
         .collect::<Vec<_>>();
 
     println!(

@@ -10,6 +10,16 @@ pub enum Icon {
     Arch,
     DetailTux,
     SimpleTux,
+    Battery(u8),
+}
+
+impl Icon {
+    pub fn new_battery(percentages: Result<u8, ()>) -> Option<Self> {
+        match percentages {
+            Ok(p) => Some(Self::Battery(p)),
+            Err(_) => None,
+        }
+    }
 }
 
 impl fmt::Display for Icon {
@@ -22,6 +32,14 @@ impl fmt::Display for Icon {
             Icon::Arch => write!(f, ""),
             Icon::DetailTux => write!(f, ""),
             Icon::SimpleTux => write!(f, "󰌽"),
+            Icon::Battery(pec) => match pec {
+                0..=20 => write!(f, ""),
+                21..=40 => write!(f, ""),
+                41..=60 => write!(f, ""),
+                61..=80 => write!(f, ""),
+                81..=100 => write!(f, ""),
+                _ => write!(f, ""),
+            },
         }
     }
 }

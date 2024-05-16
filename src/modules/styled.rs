@@ -17,22 +17,24 @@ impl StyledModule {
         }
     }
 
-    pub fn display(self) -> String {
+    pub fn display(self) -> Result<String, ()> {
+        let content = self.module.display()?;
+
         if let Some(icon) = self.icon {
-            format!(
+            Ok(format!(
                 "{}{} {}{}",
                 self.style.display(),
                 icon,
-                self.module.display(),
+                content,
                 colors::Style::default().display()
-            )
+            ))
         } else {
-            format!(
+            Ok(format!(
                 "{}{}{}",
                 self.style.display(),
-                self.module.display(),
+                content,
                 colors::Style::default().display()
-            )
+            ))
         }
     }
 }

@@ -1,3 +1,4 @@
+pub mod battery;
 pub mod styled;
 use chrono::{DateTime, Local};
 
@@ -6,17 +7,19 @@ use chrono::{DateTime, Local};
 pub enum Module {
     Manual(&'static str),
     Time(&'static str),
+    Battery,
 }
 
 impl Module {
-    fn display(self) -> String {
+    fn display(self) -> Result<String, ()> {
         match self {
-            Module::Manual(s) => String::from(s),
+            Module::Manual(s) => Ok(String::from(s)),
             Module::Time(format) => {
                 let now: DateTime<Local> = Local::now();
 
-                now.format(format).to_string()
+                Ok(now.format(format).to_string())
             }
+            Module::Battery => battery::battery_status().map(|perc| format!("{}%", perc)),
         }
     }
 }
