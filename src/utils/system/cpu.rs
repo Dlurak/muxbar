@@ -10,7 +10,7 @@ pub fn get_total_average() -> f32 {
 
     let cpus = s.cpus();
 
-    let cpu_sum = cpus.into_iter().map(|cpu| cpu.cpu_usage()).sum::<f32>();
+    let cpu_sum = cpus.iter().map(|cpu| cpu.cpu_usage()).sum::<f32>();
 
     cpu_sum / cpus.len() as f32
 }

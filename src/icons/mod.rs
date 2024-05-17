@@ -2,6 +2,7 @@ use std::fmt;
 
 // Those are only constructed in config.rs
 #[allow(dead_code)]
+#[derive(Clone, Copy)]
 pub enum Icon {
     Manual(&'static str),
     Time,

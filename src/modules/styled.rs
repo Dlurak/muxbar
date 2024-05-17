@@ -2,6 +2,7 @@ use crate::colors;
 use crate::icons;
 use crate::modules::Module;
 
+#[derive(Clone, Copy)]
 pub struct StyledModule {
     module: Module,
     icon: Option<icons::Icon>,
@@ -17,7 +18,7 @@ impl StyledModule {
         }
     }
 
-    pub fn display(self) -> Result<String, ()> {
+    pub fn display(&self) -> Result<String, ()> {
         let content = self.module.display()?;
 
         if let Some(icon) = self.icon {

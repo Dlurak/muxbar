@@ -60,7 +60,7 @@ pub fn get_modules() -> Vec<StyledModule> {
         ),
     ]
     .into_iter()
-    .filter_map(|x| x)
+    .flatten()
     .collect()
 }
 

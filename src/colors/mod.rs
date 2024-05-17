@@ -1,5 +1,6 @@
 // Those are only constructed in config.rs
 #[allow(dead_code)]
+#[derive(Clone, Copy)]
 pub enum Color {
     Black,
     White,
@@ -12,6 +13,7 @@ pub enum Color {
     Reset,
 }
 
+#[derive(Clone, Copy)]
 pub struct Style {
     pub fg: Color,
     pub bg: Color,

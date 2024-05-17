@@ -7,6 +7,7 @@ use chrono::{DateTime, Local};
 
 // Those are only constructed in config.rs
 #[allow(dead_code)]
+#[derive(Clone, Copy)]
 pub enum Module {
     Manual(&'static str),
     Time(&'static str),
