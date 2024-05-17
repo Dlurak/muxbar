@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 battery = "0.7.8"
 chrono = "0.4.38"
+sysinfo = "0.30.7"

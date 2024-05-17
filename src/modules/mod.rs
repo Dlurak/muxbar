@@ -1,5 +1,8 @@
 pub mod styled;
-use crate::utils::battery;
+use sysinfo::{MemoryRefreshKind, RefreshKind, System};
+
+use crate::utils::strings;
+use crate::utils::system::{battery, cpu};
 use chrono::{DateTime, Local};
 
 // Those are only constructed in config.rs
@@ -8,6 +11,8 @@ pub enum Module {
     Manual(&'static str),
     Time(&'static str),
     Battery,
+    Cpu(usize),
+    Memory(usize),
     SessionName,
     WindowName,
     WindowIndex,
@@ -30,6 +35,20 @@ impl Module {
             Module::WindowIndex => Ok(String::from("#I")),
             Module::PaneIndex => Ok(String::from("#P")),
             Module::Hostname => Ok(String::from("#H")),
+            Module::Cpu(rounding) => Ok(strings::round(cpu::get_total_average(), rounding)),
+            Module::Memory(rounding) => {
+                let mut sys = System::new_with_specifics(
+                    RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
+                );
+
+                sys.refresh_memory();
+
+                let total_memory = sys.total_memory();
+                let used_memory = sys.used_memory();
+
+                let memory_usage_percent = (used_memory as f64 / total_memory as f64) * 100.0;
+                Ok(strings::round(memory_usage_percent, rounding))
+            }
         }
     }
 }
