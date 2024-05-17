@@ -30,4 +30,5 @@ The configuration is written in Rust and located in `./src/config.rs`
 
 ## Examples
 
-![Default](./assets/default.png)
+![New Default](./assets/new_default.png)
+![Old Default](./assets/default.png)
