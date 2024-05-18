@@ -1,9 +1,10 @@
 pub mod styled;
-use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
 use crate::utils::strings;
 use crate::utils::system::{battery, cpu};
 use chrono::{DateTime, Local};
+use std::time::Duration;
+use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
 // Those are only constructed in config.rs
 #[allow(dead_code)]
@@ -14,6 +15,7 @@ pub enum Module {
     Battery,
     Cpu(usize),
     Memory(usize),
+    Uptime,
     SessionName,
     WindowName,
     WindowIndex,
@@ -49,6 +51,12 @@ impl Module {
 
                 let memory_usage_percent = (used_memory as f64 / total_memory as f64) * 100.0;
                 Ok(strings::round(memory_usage_percent, rounding))
+            }
+            Module::Uptime => {
+                let uptime = System::uptime() + 86444;
+                let uptime = Duration::from_secs(uptime);
+
+                Ok(format!("{}", strings::PrettyDuration::new(uptime)))
             }
         }
     }
