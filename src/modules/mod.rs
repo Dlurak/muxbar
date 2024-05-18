@@ -15,6 +15,7 @@ pub enum Module {
     Battery,
     Cpu(usize),
     Memory(usize),
+    Swap(usize),
     Uptime,
     SessionName,
     WindowName,
@@ -57,6 +58,19 @@ impl Module {
                 let uptime = Duration::from_secs(uptime);
 
                 Ok(format!("{}", strings::PrettyDuration::new(uptime)))
+            },
+            Module::Swap(rounding) => {
+                let mut sys = System::new_with_specifics(
+                    RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
+                );
+
+                sys.refresh_memory();
+
+                let total_swap = sys.total_swap();
+                let used_swap = sys.used_swap();
+
+                let swap_usage_percent = (used_swap as f64 / total_swap as f64) * 100.0;
+                Ok(strings::round(swap_usage_percent, rounding))
             }
         }
     }
