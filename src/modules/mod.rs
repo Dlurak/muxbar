@@ -53,7 +53,7 @@ impl Module {
                 Ok(strings::round(memory_usage_percent, rounding))
             }
             Module::Uptime => {
-                let uptime = System::uptime() + 86444;
+                let uptime = System::uptime();
                 let uptime = Duration::from_secs(uptime);
 
                 Ok(format!("{}", strings::PrettyDuration::new(uptime)))

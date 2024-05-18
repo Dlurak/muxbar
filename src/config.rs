@@ -11,6 +11,15 @@ pub fn get_modules() -> Vec<StyledModule> {
 
     vec![
         Some(StyledModule::new(
+            Module::Uptime,
+            None,
+            Style {
+                fg: Color::Magenta,
+                bg: Color::Reset,
+                bold: false,
+            },
+        )),
+        Some(StyledModule::new(
             Module::Time("%H:%M"),
             Some(Icon::Time),
             Style {
