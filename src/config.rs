@@ -2,12 +2,13 @@ use crate::colors::{Color, Style};
 use crate::icons::Icon;
 use crate::modules::{styled::StyledModule, Module};
 use crate::utils::conditional_insert::conditional_insert;
-use crate::utils::system::battery::battery_status;
+use crate::utils::system::battery::{battery_charging, battery_status};
 
 pub fn get_modules() -> Vec<StyledModule> {
     let battery_percentage = battery_status();
+    let battery_charging = battery_charging();
 
-    let battery_icon = Icon::new_battery(battery_percentage);
+    let battery_icon = Icon::new_battery(battery_percentage, battery_charging);
 
     vec![
         Some(StyledModule::new(

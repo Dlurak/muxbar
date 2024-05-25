@@ -58,7 +58,7 @@ impl Module {
                 let uptime = Duration::from_secs(uptime);
 
                 Ok(format!("{}", strings::PrettyDuration::new(uptime)))
-            },
+            }
             Module::Swap(rounding) => {
                 let mut sys = System::new_with_specifics(
                     RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
