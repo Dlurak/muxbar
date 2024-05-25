@@ -14,10 +14,10 @@ pub enum Icon {
     SimpleTux,
     Battery(u8),
     BatteryCharging(u8),
-
     DoubleServer,
     TripleServer,
     Cpu,
+    Tmux,
 }
 
 impl Icon {
@@ -75,6 +75,7 @@ impl fmt::Display for Icon {
             Icon::DoubleServer => write!(f, ""),
             Icon::TripleServer => write!(f, ""),
             Icon::Cpu => write!(f, ""),
+            Icon::Tmux => write!(f, ""),
         }
     }
 }

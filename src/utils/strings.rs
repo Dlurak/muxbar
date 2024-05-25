@@ -64,3 +64,48 @@ impl Display for PrettyDuration {
         write!(f, "{}", output)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
+
+    #[test]
+    fn test_pretty_duration_new() {
+        let duration = Duration::new(90061, 0); // 1 day, 1 hour, 1 minute, 1 second
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.days, 1);
+        assert_eq!(pretty_duration.hours, 1);
+        assert_eq!(pretty_duration.minutes, 1);
+        assert_eq!(pretty_duration.seconds, 1);
+    }
+
+    #[test]
+    fn test_pretty_duration_display() {
+        let duration = Duration::new(90061, 0); // 1 day, 1 hour, 1 minute, 1 second
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.to_string(), "1D 1H");
+
+        let duration = Duration::new(3661, 0); // 1 hour, 1 minute, 1 second
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.to_string(), "1H 1M");
+
+        let duration = Duration::new(61, 0); // 1 minute, 1 second
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.to_string(), "1M 1S");
+
+        let duration = Duration::new(1, 0); // 1 second
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.to_string(), "1S");
+
+        let duration = Duration::new(0, 0); // 0 seconds
+        let pretty_duration = PrettyDuration::new(duration);
+
+        assert_eq!(pretty_duration.to_string(), "0 S");
+    }
+}

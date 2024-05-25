@@ -47,6 +47,15 @@ pub fn get_modules() -> Vec<StyledModule> {
                 bold: false,
             },
         )),
+        Some(StyledModule::new(
+            Module::SessionName,
+            Some(Icon::Tmux),
+            Style {
+                fg: Color::Blue,
+                bg: Color::Reset,
+                bold: false,
+            },
+        )),
         conditional_insert(
             StyledModule::new(
                 Module::Manual("  LOW BATTERY  "),
