@@ -1,19 +1,25 @@
 use battery::{Manager, State};
 
-pub fn battery_status() -> Result<u8, ()> {
-    let mut batteries = Manager::new().and_then(|m| m.batteries()).map_err(|_| ())?;
-    let battery = batteries.next().ok_or(())?.map_err(|_| ())?;
-
-    let percentages = battery
-        .state_of_charge()
-        .get::<battery::units::ratio::percent>() as u8;
-
-    Ok(percentages)
+#[derive(Copy, Clone)]
+pub struct BatteryInformation {
+    pub percentages: u8,
+    pub is_charging: bool,
 }
 
-pub fn battery_charging() -> Result<bool, ()> {
-    let mut batteries = Manager::new().and_then(|m| m.batteries()).map_err(|_| ())?;
-    let battery = batteries.next().ok_or(())?.map_err(|_| ())?;
+impl BatteryInformation {
+    pub fn new() -> Result<Self, ()> {
+        let mut batteries = Manager::new().and_then(|m| m.batteries()).map_err(|_| ())?;
+        let battery = batteries.next().ok_or(())?.map_err(|_| ())?;
 
-    Ok(battery.state() == State::Charging)
+        let percentages = battery
+            .state_of_charge()
+            .get::<battery::units::ratio::percent>() as u8;
+
+        let is_charging = battery.state() == State::Charging;
+
+        Ok(Self {
+            percentages,
+            is_charging,
+        })
+    }
 }

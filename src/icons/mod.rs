@@ -1,3 +1,4 @@
+use crate::utils::system::battery::BatteryInformation;
 use std::fmt;
 
 // Those are only constructed in config.rs
@@ -20,9 +21,10 @@ pub enum Icon {
 }
 
 impl Icon {
-    pub fn new_battery(percentages: Result<u8, ()>, is_charging: Result<bool, ()>) -> Option<Self> {
-        let perc = percentages.ok()?;
-        let charging = is_charging.ok()?;
+    pub fn new_battery(information: &Result<BatteryInformation, ()>) -> Option<Self> {
+        let info = information.ok()?;
+        let perc = info.percentages;
+        let charging = info.is_charging;
 
         if charging {
             Some(Icon::BatteryCharging(perc))

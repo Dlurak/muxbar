@@ -1,7 +1,7 @@
 pub mod styled;
 
 use crate::utils::strings;
-use crate::utils::system::{battery, cpu};
+use crate::utils::system::{battery::BatteryInformation, cpu};
 use chrono::{DateTime, Local};
 use std::time::Duration;
 use sysinfo::{MemoryRefreshKind, RefreshKind, System};
@@ -33,7 +33,9 @@ impl Module {
 
                 Ok(now.format(format).to_string())
             }
-            Module::Battery => battery::battery_status().map(|perc| format!("{}%", perc)),
+            Module::Battery => {
+                BatteryInformation::new().map(|info| format!("{}%", info.percentages))
+            }
             Module::SessionName => Ok(String::from("#S")),
             Module::WindowName => Ok(String::from("#W")),
             Module::WindowIndex => Ok(String::from("#I")),
