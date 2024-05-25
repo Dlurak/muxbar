@@ -15,7 +15,7 @@ impl BatteryInformation {
             .state_of_charge()
             .get::<battery::units::ratio::percent>() as u8;
 
-        let is_charging = battery.state() == State::Charging;
+        let is_charging = battery.state() != State::Discharging;
 
         Ok(Self {
             percentages,
