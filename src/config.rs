@@ -7,6 +7,7 @@ use crate::utils::system::battery::BatteryInformation;
 pub fn get_modules() -> Vec<StyledModule> {
     let battery_information = BatteryInformation::new();
     let battery_percentage = battery_information.map(|x| x.percentages);
+    let is_charging = battery_information.map(|x| x.is_charging).unwrap_or(true);
 
     let battery_icon = Icon::new_battery(&battery_information);
 
@@ -66,7 +67,7 @@ pub fn get_modules() -> Vec<StyledModule> {
                     bold: true,
                 },
             ),
-            battery_percentage.unwrap_or(100) < 20,
+            battery_percentage.unwrap_or(100) < 20 && !is_charging,
         ),
     ]
     .into_iter()
