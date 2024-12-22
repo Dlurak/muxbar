@@ -1,5 +1,5 @@
 {
-  description = "Description for the project";
+  description = "Tmux status line configured in Rust";
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -39,7 +39,15 @@
         # system.
         packages = rec {
           default = muxbar;
-          muxbar = inputs.naersk.lib.${system}.buildPackage {src = ./.;};
+          muxbar = inputs.naersk.lib.${system}.buildPackage {
+            src = ./.;
+            meta = {
+              mainProgram = "muxbar";
+              description = "Tmux status line configured in Rust";
+              homepage = "https://github.com/Dlurak/muxbar";
+              license = inputs.nixpkgs.lib.licenses.gpl3Only;
+            };
+          };
         };
 
         devenv.shells.default = {
