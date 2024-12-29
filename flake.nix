@@ -6,12 +6,6 @@
     nixpkgs.url = "github:cachix/devenv-nixpkgs/rolling";
     naersk.url = "github:nix-community/naersk";
     systems.url = "github:nix-systems/default-linux";
-    devenv.url = "github:cachix/devenv";
-  };
-
-  nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-    extra-substituters = "https://devenv.cachix.org";
   };
 
   outputs = inputs @ {
@@ -20,7 +14,6 @@
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      imports = [inputs.devenv.flakeModule];
       systems = import systems;
 
       perSystem = {
@@ -47,9 +40,9 @@
           };
         };
 
-        devenv.shells.default = {
-          name = "muxbar";
-          languages.rust.enable = true;
+        devShells.default = with pkgs; mkShell {
+          buildInputs = [ cargo rustc rustfmt pre-commit rustPackages.clippy ];
+          RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
 
         formatter = pkgs.alejandra;
