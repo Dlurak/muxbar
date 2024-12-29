@@ -1,23 +1,33 @@
+#![allow(dead_code)]
 mod colors;
 mod config;
 mod icons;
 mod modules;
 mod utils;
 
-use std::sync::Arc;
-use std::thread;
-
 fn main() {
     let modules = config::get_modules();
 
-    let handles = modules.into_iter().map(|styled_mod| {
-        let styled_mod = Arc::new(styled_mod);
-        let thread_styled_mod = Arc::clone(&styled_mod);
+    #[cfg(debug_assertions)]
+    let instant = std::time::Instant::now();
 
-        thread::spawn(move || thread_styled_mod.display().ok())
-    });
+    // NOTE: This is the multi-threaded version of the code.
+    // Already runs this in a separate thead, so it's not necessary to do it again.
+    //
+    // use std::thread;
+    // let strings: Vec<_> = modules
+    //     .into_iter()
+    //     .map(|styled_mod| thread::spawn(move || styled_mod.to_string()))
+    //     .filter_map(|t| t.join().ok())
+    //     .collect();
 
-    let strings: Vec<_> = handles.filter_map(|t| t.join().ok().flatten()).collect();
+    let strings: Vec<_> = modules
+        .into_iter()
+        .map(|styled_mod| styled_mod.to_string())
+        .collect();
+
+    #[cfg(debug_assertions)]
+    println!("{:?}", instant.elapsed());
 
     println!(
         "{}{}{}",
