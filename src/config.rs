@@ -50,7 +50,7 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
                 bold: false,
             },
         )),
-        NvidiaModule::new_percentage(),
+        NvidiaModule::new(true),
         // Battery module with warning indicators
         Battery::get_with_warning(),
         // Tmux session information modules
