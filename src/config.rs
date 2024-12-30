@@ -4,6 +4,7 @@ use crate::colors::{Color, Style};
 use crate::icons::Icon;
 use crate::modules::battery::Battery;
 use crate::modules::datetime::DateTime;
+use crate::modules::high_cpu::HighCpuModule;
 use crate::modules::nvidia::NvidiaModule;
 use crate::modules::systemstats::{Cpu, Memory, Swap};
 use crate::modules::tmux::TmuxContent;
@@ -15,6 +16,7 @@ use crate::modules::Module;
 /// The modules are arranged in the order they will appear in the status bar.
 pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
+        HighCpuModule::new(),
         // System CPU usage module with custom styling
         Box::new(Module::new(
             Cpu {

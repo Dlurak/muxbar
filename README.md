@@ -53,3 +53,6 @@ The configuration is written in Rust and located in `./src/config.rs`
   ```bash
   set -g status-right '#(bash -c "command -v muxbar >/dev/null 2>&1 && muxbar || echo muxbar not installed")'
   ```
+
+- You don't need to restart tmux to apply the changes. Just run the `cargo install --path .`  command to apply changes to confoiguration or your custom modules.
+- [Nice overview of tmux colors](https://i.sstatic.net/e63et.png)
