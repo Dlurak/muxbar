@@ -19,22 +19,32 @@ impl HighCpuModule {
         let mut system = System::new_all();
         system.refresh_all();
 
-        let process_info = system
+        let process_info: Vec<String> = system
             .processes()
             .values()
-            .max_by_key(|p| p.cpu_usage() as u32)
+            .filter(|p| p.cpu_usage() > 0.001)
+            // .collect::<Vec<_>>()
+            // .max_by_key(|p| (p.cpu_usage() * 100.0) as u32)
             .map(|p| {
                 let name = p.name().to_str().unwrap_or("").to_string();
+                println!("{:?} {:?}", p.name(), p.cpu_usage());
                 if name.len() > 30 {
                     format!("{}...", &name[..27])
                 } else {
-                    name
+                    format!("{} {}", name, p.cpu_usage())
                 }
             })
-            .unwrap_or_else(|| "No process found".to_string());
+            .collect();
+        // println!("{}", process_info);
+        // .unwrap_or_else(|| "No process found".to_string());
+
+        // #[cfg(debug_assertions)]
+        // println!("{:?}", process_info);
 
         Box::new(Module::new(
-            HighCpuModule { process_info },
+            HighCpuModule {
+                process_info: "porces".to_string(),
+            },
             Some(Icon::Manual("󰑓")),
             Style {
                 fg: Color::Any("color61"),
