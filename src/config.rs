@@ -4,6 +4,7 @@ use crate::colors::{Color, Style};
 use crate::icons::Icon;
 use crate::modules::battery::Battery;
 use crate::modules::datetime::DateTime;
+use crate::modules::nvidia::NvidiaModule;
 use crate::modules::systemstats::{Cpu, Memory, Swap};
 use crate::modules::tmux::TmuxContent;
 use crate::modules::Module;
@@ -14,18 +15,7 @@ use crate::modules::Module;
 /// The modules are arranged in the order they will appear in the status bar.
 pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
-        // Use a preset of the DateTime module
-        DateTime::date(),
-        // Configure DateTime module with custom format and style
-        Box::new(Module::new(
-            DateTime("%H:%M"),
-            Some(Icon::Time),
-            Style {
-                fg: Color::Magenta,
-                bg: Color::Reset,
-                bold: false,
-            },
-        )),
+        TmuxContent::WindowName.get_standard(),
         // System CPU usage module with custom styling
         Box::new(Module::new(
             Cpu {
@@ -49,6 +39,7 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
                 bold: false,
             },
         )),
+        NvidiaModule::new(),
         // System Memory usage module with custom styling
         Box::new(Module::new(
             Swap::default(),
@@ -63,12 +54,23 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
         Battery::get_with_warning(),
         // Tmux session information modules
         TmuxContent::SessionName.get_standard(),
-        TmuxContent::WindowName.get_standard(),
         Box::new(Module::new(
             TmuxContent::Hostname,
             Some(Icon::DoubleServer),
             Style {
                 fg: Color::White,
+                bg: Color::Reset,
+                bold: false,
+            },
+        )),
+        // Use a preset of the DateTime module
+        DateTime::date(),
+        // Configure DateTime module with custom format and style
+        Box::new(Module::new(
+            DateTime("%H:%M"),
+            Some(Icon::Time),
+            Style {
+                fg: Color::Magenta,
                 bg: Color::Reset,
                 bold: false,
             },

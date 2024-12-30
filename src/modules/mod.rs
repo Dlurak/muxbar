@@ -1,5 +1,6 @@
 pub mod battery;
 pub mod datetime;
+pub mod nvidia;
 pub mod systemstats;
 pub mod tmux;
 
@@ -38,3 +39,4 @@ impl<T: fmt::Display> fmt::Display for Module<T> {
         )
     }
 }
+

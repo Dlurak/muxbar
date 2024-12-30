@@ -38,6 +38,8 @@ pub enum Icon {
     Cpu,
     /// Tmux icon
     Tmux,
+    /// Nvidia
+    Nvidia,
 }
 
 impl Icon {
@@ -111,6 +113,7 @@ impl fmt::Display for Icon {
             Icon::TripleServer => write!(f, ""),
             Icon::Cpu => write!(f, ""),
             Icon::Tmux => write!(f, ""),
+            Icon::Nvidia => write!(f, "󱎴"),
         }
     }
 }
