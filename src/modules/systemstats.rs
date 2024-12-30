@@ -23,13 +23,14 @@ impl Default for Cpu {
 impl Cpu {
     /// Returns the average CPU usage across all cores as a percentage
     fn get_total_average() -> f32 {
-        let mut s =
-            System::new_with_specifics(RefreshKind::new().with_cpu(CpuRefreshKind::everything()));
+        let mut s = System::new_with_specifics(
+            RefreshKind::nothing().with_cpu(CpuRefreshKind::everything()),
+        );
 
         // NOTE: Documentation says that it should b ecalled twice.
-        s.refresh_cpu();
+        s.refresh_cpu_all();
         thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        s.refresh_cpu();
+        s.refresh_cpu_all();
 
         let cpus = s.cpus();
 
@@ -72,7 +73,7 @@ impl fmt::Display for Memory {
     /// Formats the memory usage as a percentage string with specified decimal places and minimum digits
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut sys = System::new_with_specifics(
-            RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
+            RefreshKind::nothing().with_memory(MemoryRefreshKind::everything()),
         );
 
         sys.refresh_memory();
@@ -100,11 +101,19 @@ pub struct Swap {
     /// Minimum number of digits to display
     pub minimum_digits: usize,
 }
+impl Default for Swap {
+    fn default() -> Self {
+        Self {
+            decimal_places: 0,
+            minimum_digits: 2,
+        }
+    }
+}
 impl fmt::Display for Swap {
     /// Formats the swap usage as a percentage string with specified decimal places and minimum digits
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut sys = System::new_with_specifics(
-            RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
+            RefreshKind::nothing().with_memory(MemoryRefreshKind::everything()),
         );
 
         sys.refresh_memory();
@@ -115,7 +124,7 @@ impl fmt::Display for Swap {
         let swap_usage_percent = (used_swap as f64 / total_swap as f64) * 100.0;
         write!(
             f,
-            "{}%",
+            "{}",
             strings::round(swap_usage_percent, self.decimal_places, self.minimum_digits)
         )
     }

@@ -4,7 +4,7 @@ use crate::colors::{Color, Style};
 use crate::icons::Icon;
 use crate::modules::battery::Battery;
 use crate::modules::datetime::DateTime;
-use crate::modules::systemstats::{Cpu, Memory};
+use crate::modules::systemstats::{Cpu, Memory, Swap};
 use crate::modules::tmux::TmuxContent;
 use crate::modules::Module;
 
@@ -45,6 +45,16 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
             Some(Icon::DoubleServer),
             Style {
                 fg: Color::Yellow,
+                bg: Color::Reset,
+                bold: false,
+            },
+        )),
+        // System Memory usage module with custom styling
+        Box::new(Module::new(
+            Swap::default(),
+            Some(Icon::TripleServer),
+            Style {
+                fg: Color::Red,
                 bg: Color::Reset,
                 bold: false,
             },

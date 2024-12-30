@@ -7,6 +7,8 @@ use crate::icons::Icon;
 
 use super::Module;
 
+// TODO: The custom error type is unnecessary for now
+//
 /// Error type for battery-related operations
 #[derive(Debug)]
 pub struct BatteryError;
