@@ -16,9 +16,9 @@ impl fmt::Display for NvidiaModule {
         if self.memory_used == "N/A" || self.memory_total == "N/A" {
             write!(f, "")
         } else if self.view_as_percentage {
-            write!(f, "GPU: {}", self.memory_used)
+            write!(f, "{}", self.memory_used)
         } else {
-            write!(f, "GPU: {:>4}/{:>4}", self.memory_used, self.memory_total)
+            write!(f, "{:>4}/{:>4}", self.memory_used, self.memory_total)
         }
     }
 }

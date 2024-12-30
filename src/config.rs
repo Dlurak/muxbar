@@ -15,7 +15,6 @@ use crate::modules::Module;
 /// The modules are arranged in the order they will appear in the status bar.
 pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
-        TmuxContent::PaneIndex.get_standard(),
         // System CPU usage module with custom styling
         Box::new(Module::new(
             Cpu {
@@ -54,15 +53,16 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
         Battery::get_with_warning(),
         // Tmux session information modules
         // TmuxContent::SessionName.get_standard(),
-        Box::new(Module::new(
-            TmuxContent::Hostname,
-            Some(Icon::DoubleServer),
-            Style {
-                fg: Color::White,
-                bg: Color::Reset,
-                bold: false,
-            },
-        )),
+        // Box::new(Module::new(
+        //     TmuxContent::Hostname,
+        //     Some(Icon::DoubleServer),
+        //     Style {
+        //         fg: Color::White,
+        //         bg: Color::Reset,
+        //         bold: false,
+        //     },
+        // )),
+        TmuxContent::PaneIndex.get_standard(),
         // Use a preset of the DateTime module
         DateTime::date(),
         // Configure DateTime module with custom format and style
