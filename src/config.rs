@@ -16,7 +16,7 @@ use crate::modules::Module;
 /// The modules are arranged in the order they will appear in the status bar.
 pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
-        HighCpu::new(),
+        HighCpu::new(None, None),
         // System CPU usage module with custom styling
         Box::new(Module::new(
             Cpu {

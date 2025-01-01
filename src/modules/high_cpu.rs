@@ -41,7 +41,7 @@ impl HighCpu {
     /// # Returns
     ///
     /// A `Box<Module<HighCpuModule>>` containing the process information.
-    pub fn new() -> Box<Module<HighCpu>> {
+    pub fn new(fg: Option<Color>, bg: Option<Color>) -> Box<Module<HighCpu>> {
         let output_raw = Command::new("ps")
             .arg("axo")
             .arg("pid,pcpu,comm")
@@ -85,8 +85,8 @@ impl HighCpu {
             HighCpu { process_info },
             Some(Icon::Manual("󰑓")),
             Style {
-                fg: Color::Any("color61"),
-                bg: Color::Reset,
+                fg: fg.unwrap_or(Color::Any("color61")),
+                bg: bg.unwrap_or(Color::Reset),
                 bold: true,
             },
         ))
