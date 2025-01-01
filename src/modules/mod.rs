@@ -30,13 +30,29 @@ impl<T> Module<T> {
 
 impl<T: fmt::Display> fmt::Display for Module<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
+        let res = format!(
             "{}{} {}{}",
             self.style,
             self.icon.unwrap_or(Icon::Empty),
             self.content,
             Style::default()
-        )
+        );
+        match res.trim().is_empty() {
+            true => write!(f, ""),
+            false => write!(f, "{}", res),
+        }
+    }
+}
+
+impl<T> Default for Module<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Self {
+            content: T::default(),
+            icon: None,
+            style: Style::default(),
+        }
     }
 }

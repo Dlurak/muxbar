@@ -5,13 +5,13 @@ use std::fmt;
 use std::process::Command;
 use std::str;
 
-pub struct NvidiaModule {
+pub struct Nvidia {
     pub memory_used: String,
     pub memory_total: String,
     pub view_as_percentage: bool,
 }
 
-impl fmt::Display for NvidiaModule {
+impl fmt::Display for Nvidia {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.memory_used == "N/A" || self.memory_total == "N/A" {
             write!(f, "")
@@ -25,10 +25,10 @@ impl fmt::Display for NvidiaModule {
     }
 }
 
-impl NvidiaModule {
-    fn empty() -> Module<NvidiaModule> {
+impl Nvidia {
+    fn empty() -> Module<Nvidia> {
         Module::new(
-            NvidiaModule {
+            Nvidia {
                 memory_used: "N/A".to_string(),
                 memory_total: "N/A".to_string(),
                 view_as_percentage: false,
@@ -42,7 +42,7 @@ impl NvidiaModule {
         )
     }
 
-    pub fn new(view_as_percentage: bool) -> Box<Module<NvidiaModule>> {
+    pub fn new(view_as_percentage: bool) -> Box<Module<Nvidia>> {
         let output = Command::new("nvidia-smi")
             .arg("--query-gpu=memory.used,memory.total")
             .arg("--format=csv,noheader,nounits")
@@ -55,7 +55,7 @@ impl NvidiaModule {
                 let memory_used = parts.next().unwrap_or("N/A").trim().to_string();
                 let memory_total = parts.next().unwrap_or("N/A").trim().to_string();
                 Box::new(Module::new(
-                    NvidiaModule {
+                    Nvidia {
                         memory_used,
                         memory_total,
                         view_as_percentage,
@@ -68,7 +68,7 @@ impl NvidiaModule {
                     },
                 ))
             }
-            Err(_) => Box::new(NvidiaModule::empty()),
+            Err(_) => Box::new(Nvidia::empty()),
         }
     }
 }

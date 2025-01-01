@@ -109,7 +109,7 @@ impl fmt::Display for Icon {
                 94..=100 => write!(f, "󰂅"),
                 _ => write!(f, ""),
             },
-            Icon::DoubleServer => write!(f, ""),
+            Icon::DoubleServer => write!(f, ""),
             Icon::TripleServer => write!(f, ""),
             Icon::Cpu => write!(f, ""),
             Icon::Tmux => write!(f, ""),

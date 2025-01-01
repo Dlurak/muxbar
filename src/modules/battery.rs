@@ -67,7 +67,11 @@ impl Battery {
     /// # Returns
     /// A boxed Module containing battery information with default styling
     pub fn get_standard() -> Box<Module<Battery>> {
-        let battery = Battery::new().unwrap_or_default();
+        let battery = match Battery::new() {
+            Ok(battery) => battery,
+            Err(_) => return Box::new(Module::default()),
+        };
+
         let battery_icon = Icon::new_battery(&battery);
         Box::new(Module::new(
             battery,

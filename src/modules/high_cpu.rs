@@ -6,33 +6,51 @@ use std::fmt;
 use std::process::Command;
 
 /// A module to display the process with the highest CPU usage.
-pub struct HighCpuModule {
+///
+/// NOTE that the high CPU process is determined by the `ps` command.
+/// So, this is only available on linux or macos.
+pub struct HighCpu {
     /// Field to store process information
     process_info: String,
 }
 
-impl fmt::Display for HighCpuModule {
+impl fmt::Display for HighCpu {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.process_info)
     }
 }
 
-impl HighCpuModule {
+impl Default for HighCpu {
+    fn default() -> Self {
+        Self {
+            process_info: "".to_string(),
+        }
+    }
+}
+
+impl HighCpu {
     /// Creates a new instance of HighCpuModule.
     ///
     /// This method runs the `ps` command to get the process information,
     /// processes the output to find the process with the highest CPU usage,
     /// and returns a boxed Module containing the HighCpuModule.
     ///
+    /// Note, that this is only available on linux or macos.
+    /// When the "ps" command fails, it returns a default Module.
+    ///
     /// # Returns
     ///
     /// A `Box<Module<HighCpuModule>>` containing the process information.
-    pub fn new() -> Box<Module<HighCpuModule>> {
-        let output = Command::new("ps")
+    pub fn new() -> Box<Module<HighCpu>> {
+        let output_raw = Command::new("ps")
             .arg("axo")
             .arg("pid,pcpu,comm")
             .output()
-            .expect("Failed to execute ps command");
+            .ok();
+        let output = match output_raw {
+            Some(output) => output,
+            None => return Box::new(Module::default()),
+        };
 
         let process_info = if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
@@ -64,7 +82,7 @@ impl HighCpuModule {
         };
 
         Box::new(Module::new(
-            HighCpuModule { process_info },
+            HighCpu { process_info },
             Some(Icon::Manual("󰑓")),
             Style {
                 fg: Color::Any("color61"),
