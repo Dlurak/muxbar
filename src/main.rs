@@ -24,6 +24,7 @@ fn main() {
     let strings: Vec<_> = modules
         .into_iter()
         .map(|styled_mod| styled_mod.to_string())
+        .filter(|t| !t.is_empty())
         .collect();
 
     #[cfg(debug_assertions)]

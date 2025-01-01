@@ -7,20 +7,6 @@ use crate::icons::Icon;
 
 use super::Module;
 
-// TODO: The custom error type is unnecessary for now
-//
-/// Error type for battery-related operations
-#[derive(Debug)]
-pub struct BatteryError;
-
-impl fmt::Display for BatteryError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Battery error")
-    }
-}
-
-impl Error for BatteryError {}
-
 /// Represents the battery status including charge level and charging state
 #[derive(Copy, Clone, Default)]
 pub struct Battery {
@@ -39,25 +25,34 @@ impl Battery {
     pub fn new() -> Result<Self, Box<dyn Error>> {
         let manager = Manager::new()?;
         let mut batteries = manager.batteries()?;
-        let battery = batteries.next().ok_or(BatteryError)??;
+        if let Some(Ok(battery)) = batteries.next() {
+            let percentages = battery
+                .state_of_charge()
+                .get::<battery::units::ratio::percent>() as u8;
 
-        let percentages = battery
-            .state_of_charge()
-            .get::<battery::units::ratio::percent>() as u8;
+            let is_charging = battery.state() != State::Discharging;
 
-        let is_charging = battery.state() != State::Discharging;
-
-        Ok(Self {
-            percentages,
-            is_charging,
-        })
+            Ok(Self {
+                percentages,
+                is_charging,
+            })
+        } else {
+            Ok(Self {
+                percentages: 0,
+                is_charging: false,
+            })
+        }
     }
 }
 
 impl fmt::Display for Battery {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let battery_text = format!("{:>3}%", self.percentages);
-        write!(f, "{:>3}", battery_text)
+        if self.percentages == 0 {
+            write!(f, "")
+        } else {
+            let battery_text = format!("{:>3}%", self.percentages);
+            write!(f, "{:>3}", battery_text)
+        }
     }
 }
 
@@ -91,9 +86,14 @@ impl Battery {
     /// # Returns
     /// A boxed Module containing battery information with conditional styling
     pub fn get_with_warning(bg: Option<Color>) -> Box<Module<String>> {
-        let battery = Battery::new().unwrap_or_default();
+        let battery = match Battery::new() {
+            Ok(battery) => battery,
+            Err(_) => return Box::new(Module::default()),
+        };
         let battery_icon = Icon::new_battery(&battery);
-        if battery.percentages > 20 || battery.is_charging {
+        if battery.percentages == 0 {
+            Box::new(Module::default())
+        } else if battery.percentages > 20 || battery.is_charging {
             Box::new(Module::new(
                 battery.to_string(),
                 battery_icon,
@@ -123,7 +123,10 @@ impl Battery {
     /// # Returns
     /// A boxed Module containing battery information with the specified style
     pub fn get_styled(style: Style) -> Box<Module<Battery>> {
-        let battery = Battery::new().unwrap_or_default();
+        let battery = match Battery::new() {
+            Ok(battery) => battery,
+            Err(_) => return Box::new(Module::default()),
+        };
         let battery_icon = Icon::new_battery(&battery);
         Box::new(Module::new(battery, battery_icon, style))
     }

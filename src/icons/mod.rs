@@ -53,6 +53,9 @@ impl Icon {
     pub fn new_battery(info: &Battery) -> Option<Self> {
         let perc = info.percentages;
         let charging = info.is_charging;
+        if perc == 0 {
+            return None;
+        }
 
         if charging {
             Some(Icon::BatteryCharging(perc))

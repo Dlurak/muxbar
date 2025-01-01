@@ -37,7 +37,10 @@ impl<T: fmt::Display> fmt::Display for Module<T> {
             self.content,
             Style::default()
         );
-        match res.trim().is_empty() {
+        match format!("{}{}", self.icon.unwrap_or(Icon::Empty), self.content)
+            .trim()
+            .is_empty()
+        {
             true => write!(f, ""),
             false => write!(f, "{}", res),
         }
