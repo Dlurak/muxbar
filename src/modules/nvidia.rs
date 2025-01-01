@@ -42,7 +42,11 @@ impl Nvidia {
         )
     }
 
-    pub fn new(view_as_percentage: bool) -> Box<Module<Nvidia>> {
+    pub fn new(
+        view_as_percentage: bool,
+        fg: Option<Color>,
+        bg: Option<Color>,
+    ) -> Box<Module<Nvidia>> {
         let output = Command::new("nvidia-smi")
             .arg("--query-gpu=memory.used,memory.total")
             .arg("--format=csv,noheader,nounits")
@@ -62,8 +66,8 @@ impl Nvidia {
                     },
                     Some(Icon::Nvidia),
                     Style {
-                        fg: Color::Any("color34"),
-                        bg: Color::Reset,
+                        fg: fg.unwrap_or(Color::Any("color34")),
+                        bg: bg.unwrap_or(Color::Reset),
                         bold: false,
                     },
                 ))

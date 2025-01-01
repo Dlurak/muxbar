@@ -90,7 +90,7 @@ impl Battery {
     ///
     /// # Returns
     /// A boxed Module containing battery information with conditional styling
-    pub fn get_with_warning() -> Box<Module<String>> {
+    pub fn get_with_warning(bg: Option<Color>) -> Box<Module<String>> {
         let battery = Battery::new().unwrap_or_default();
         let battery_icon = Icon::new_battery(&battery);
         if battery.percentages > 20 || battery.is_charging {
@@ -99,7 +99,7 @@ impl Battery {
                 battery_icon,
                 Style {
                     fg: Color::Green,
-                    bg: Color::Reset,
+                    bg: bg.unwrap_or(Color::Reset),
                     bold: false,
                 },
             ))

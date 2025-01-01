@@ -16,8 +16,9 @@ use crate::modules::Module;
 /// The modules are arranged in the order they will appear in the status bar.
 pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
+        // Some modules have a default style and icon
         HighCpu::new(None, None),
-        // System CPU usage module with custom styling
+        // System CPU usage module with customized appearance
         Box::new(Module::new(
             Cpu {
                 minimum_digits: 2,
@@ -30,7 +31,7 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
                 bold: false,
             },
         )),
-        // System Memory usage module with custom styling
+        // System Memory usage module with customized appearance
         Box::new(Module::new(
             Memory::default(),
             Some(Icon::DoubleServer),
@@ -40,7 +41,7 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
                 bold: false,
             },
         )),
-        // System Memory usage module with custom styling
+        // System Memory usage module with customized appearance
         Box::new(Module::new(
             Swap::default(),
             Some(Icon::TripleServer),
@@ -50,9 +51,9 @@ pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
                 bold: false,
             },
         )),
-        Nvidia::new(true),
+        Nvidia::new(true, None, None),
         // Battery module with warning indicators
-        Battery::get_with_warning(),
+        Battery::get_with_warning(None),
         // Tmux session information modules
         // TmuxContent::SessionName.get_standard(),
         // Box::new(Module::new(
