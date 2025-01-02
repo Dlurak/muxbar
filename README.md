@@ -51,6 +51,7 @@ The configuration is written in Rust and located in `./src/config.rs`
 - When you want to use the same tmux.conf on other machines, where `muxbar` is not installed, you can use the following alternative configuration command which checks, if `muxbar` is installed:
 
   ```bash
+  set -g status-right-length 1000  # The standard settings of muxbar are quite long
   set -g status-right '#(bash -c "command -v muxbar >/dev/null 2>&1 && muxbar || echo muxbar not installed")'
   ```
 
