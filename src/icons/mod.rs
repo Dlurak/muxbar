@@ -1,30 +1,61 @@
-use crate::utils::system::battery::BatteryInformation;
 use std::fmt;
 
-// Those are only constructed in config.rs
-#[allow(dead_code)]
-#[derive(Clone, Copy)]
+use crate::modules::battery::Battery;
+
+/// Enum representing various icons used in the application
+///
+/// Icons can be static strings, battery levels, or other predefined symbols.
+#[derive(Clone, Copy, Default)]
 pub enum Icon {
+    /// Default empty icon
+    #[default]
+    Empty,
+    /// Manually specified icon
     Manual(&'static str),
+    /// Time icon
     Time,
+    /// Date icon
+    Date,
+    /// Hyprland icon
     Hyprland,
+    /// I3 window manager icon
     I3,
+    /// Arch Linux icon
     Arch,
+    /// Detailed Tux (Linux mascot) icon
     DetailTux,
+    /// Simple Tux (Linux mascot) icon
     SimpleTux,
+    /// Battery level icon with percentage
     Battery(u8),
+    /// Battery charging icon with percentage
     BatteryCharging(u8),
+    /// Double server icon
     DoubleServer,
+    /// Triple server icon
     TripleServer,
+    /// CPU icon
     Cpu,
+    /// Tmux icon
     Tmux,
+    /// Nvidia
+    Nvidia,
 }
 
 impl Icon {
-    pub fn new_battery(information: &Result<BatteryInformation, ()>) -> Option<Self> {
-        let info = information.ok()?;
+    /// Creates a new battery icon based on battery information
+    ///
+    /// # Arguments
+    /// * `info` - Reference to a Battery struct containing battery information
+    ///
+    /// # Returns
+    /// An Option containing either a Battery or BatteryCharging icon
+    pub fn new_battery(info: &Battery) -> Option<Self> {
         let perc = info.percentages;
         let charging = info.is_charging;
+        if perc == 0 {
+            return None;
+        }
 
         if charging {
             Some(Icon::BatteryCharging(perc))
@@ -35,10 +66,19 @@ impl Icon {
 }
 
 impl fmt::Display for Icon {
+    /// Formats the icon for display
+    ///
+    /// # Arguments
+    /// * `f` - Formatter to write the formatted string
+    ///
+    /// # Returns
+    /// A Result indicating success or failure
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Icon::Empty => write!(f, ""),
             Icon::Manual(s) => write!(f, "{}", s),
             Icon::Time => write!(f, ""),
+            Icon::Date => write!(f, ""),
             Icon::Hyprland => write!(f, ""),
             Icon::I3 => write!(f, ""),
             Icon::Arch => write!(f, ""),
@@ -72,10 +112,11 @@ impl fmt::Display for Icon {
                 94..=100 => write!(f, "󰂅"),
                 _ => write!(f, ""),
             },
-            Icon::DoubleServer => write!(f, ""),
+            Icon::DoubleServer => write!(f, ""),
             Icon::TripleServer => write!(f, ""),
             Icon::Cpu => write!(f, ""),
             Icon::Tmux => write!(f, ""),
+            Icon::Nvidia => write!(f, "󱎴"),
         }
     }
 }
