@@ -1,79 +1,61 @@
-pub mod styled;
+pub mod battery;
+pub mod datetime;
+pub mod high_cpu;
+pub mod nvidia;
+pub mod systemstats;
+pub mod tmux;
 
-use crate::utils::strings;
-use crate::utils::system::{battery::BatteryInformation, cpu};
-use chrono::{DateTime, Local};
-use std::time::Duration;
-use sysinfo::{MemoryRefreshKind, RefreshKind, System};
+use std::fmt;
 
-// Those are only constructed in config.rs
-#[allow(dead_code)]
+use crate::colors;
+use crate::colors::Style;
+use crate::icons::Icon;
+
 #[derive(Clone, Copy)]
-pub enum Module {
-    Manual(&'static str),
-    Time(&'static str),
-    Battery,
-    Cpu(usize),
-    Memory(usize),
-    Swap(usize),
-    Uptime,
-    SessionName,
-    WindowName,
-    WindowIndex,
-    PaneIndex,
-    Hostname,
+pub struct Module<T> {
+    content: T,
+    icon: Option<Icon>,
+    style: Style,
 }
 
-impl Module {
-    fn display(self) -> Result<String, ()> {
-        match self {
-            Module::Manual(s) => Ok(String::from(s)),
-            Module::Time(format) => {
-                let now: DateTime<Local> = Local::now();
+impl<T> Module<T> {
+    pub fn new(content: T, icon: Option<Icon>, style: colors::Style) -> Self {
+        Self {
+            content,
+            icon,
+            style,
+        }
+    }
+}
 
-                Ok(now.format(format).to_string())
-            }
-            Module::Battery => {
-                BatteryInformation::new().map(|info| format!("{}%", info.percentages))
-            }
-            Module::SessionName => Ok(String::from("#S")),
-            Module::WindowName => Ok(String::from("#W")),
-            Module::WindowIndex => Ok(String::from("#I")),
-            Module::PaneIndex => Ok(String::from("#P")),
-            Module::Hostname => Ok(String::from("#H")),
-            Module::Cpu(rounding) => Ok(strings::round(cpu::get_total_average(), rounding)),
-            Module::Memory(rounding) => {
-                let mut sys = System::new_with_specifics(
-                    RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
-                );
+impl<T: fmt::Display> fmt::Display for Module<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let res = format!(
+            "{}{} {}{}",
+            self.style,
+            self.icon.unwrap_or(Icon::Empty),
+            self.content,
+            Style::default()
+        );
+        match format!("{}{}", self.icon.unwrap_or(Icon::Empty), self.content)
+            .trim()
+            .is_empty()
+        {
+            true => write!(f, ""),
+            false => write!(f, "{}", res),
+        }
+    }
+}
 
-                sys.refresh_memory();
-
-                let total_memory = sys.total_memory();
-                let used_memory = sys.used_memory();
-
-                let memory_usage_percent = (used_memory as f64 / total_memory as f64) * 100.0;
-                Ok(strings::round(memory_usage_percent, rounding))
-            }
-            Module::Uptime => {
-                let uptime = System::uptime();
-                let uptime = Duration::from_secs(uptime);
-
-                Ok(format!("{}", strings::PrettyDuration::new(uptime)))
-            }
-            Module::Swap(rounding) => {
-                let mut sys = System::new_with_specifics(
-                    RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
-                );
-
-                sys.refresh_memory();
-
-                let total_swap = sys.total_swap();
-                let used_swap = sys.used_swap();
-
-                let swap_usage_percent = (used_swap as f64 / total_swap as f64) * 100.0;
-                Ok(strings::round(swap_usage_percent, rounding))
-            }
+impl<T> Default for Module<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Self {
+            content: T::default(),
+            icon: None,
+            style: Style::default(),
         }
     }
 }

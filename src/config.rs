@@ -1,28 +1,29 @@
+use std::fmt::Display;
+
 use crate::colors::{Color, Style};
 use crate::icons::Icon;
-use crate::modules::{styled::StyledModule, Module};
-use crate::utils::conditional_insert::conditional_insert;
-use crate::utils::system::battery::BatteryInformation;
+use crate::modules::battery::Battery;
+use crate::modules::datetime::DateTime;
+use crate::modules::high_cpu::HighCpu;
+use crate::modules::nvidia::Nvidia;
+use crate::modules::systemstats::{Cpu, Memory, Swap};
+use crate::modules::tmux::TmuxContent;
+use crate::modules::Module;
 
-pub fn get_modules() -> Vec<StyledModule> {
-    let battery_information = BatteryInformation::new();
-    let battery_percentage = battery_information.map(|x| x.percentages);
-    let is_charging = battery_information.map(|x| x.is_charging).unwrap_or(true);
-
-    let battery_icon = Icon::new_battery(&battery_information);
-
+/// Should return a vector of display modules for the status bar
+///
+/// Each module implements the Display trait
+/// The modules are arranged in the order they will appear in the status bar.
+pub fn get_modules() -> Vec<Box<dyn Display + Send>> {
     vec![
-        Some(StyledModule::new(
-            Module::Time("%H:%M:%S"),
-            Some(Icon::Time),
-            Style {
-                fg: Color::Magenta,
-                bg: Color::Reset,
-                bold: false,
+        // Some modules have a default style and icon
+        HighCpu::new(None, None),
+        // System CPU usage module with customized appearance
+        Box::new(Module::new(
+            Cpu {
+                minimum_digits: 2,
+                decimal_places: 0,
             },
-        )),
-        Some(StyledModule::new(
-            Module::Cpu(2),
             Some(Icon::Cpu),
             Style {
                 fg: Color::Cyan,
@@ -30,8 +31,9 @@ pub fn get_modules() -> Vec<StyledModule> {
                 bold: false,
             },
         )),
-        Some(StyledModule::new(
-            Module::Memory(2),
+        // System Memory usage module with customized appearance
+        Box::new(Module::new(
+            Memory::default(),
             Some(Icon::DoubleServer),
             Style {
                 fg: Color::Yellow,
@@ -39,50 +41,57 @@ pub fn get_modules() -> Vec<StyledModule> {
                 bold: false,
             },
         )),
-        Some(StyledModule::new(
-            Module::Battery,
-            battery_icon,
+        // System Memory usage module with customized appearance
+        Box::new(Module::new(
+            Swap::default(),
+            Some(Icon::TripleServer),
             Style {
-                fg: Color::Green,
+                fg: Color::Red,
                 bg: Color::Reset,
                 bold: false,
             },
         )),
-        Some(StyledModule::new(
-            Module::SessionName,
-            Some(Icon::Tmux),
+        Nvidia::new(true, None, None),
+        // Battery module with warning indicators
+        Battery::get_with_warning(None),
+        // Tmux session information modules
+        // TmuxContent::SessionName.get_standard(),
+        // Box::new(Module::new(
+        //     TmuxContent::Hostname,
+        //     Some(Icon::DoubleServer),
+        //     Style {
+        //         fg: Color::White,
+        //         bg: Color::Reset,
+        //         bold: false,
+        //     },
+        // )),
+        TmuxContent::PaneIndex.get_standard(),
+        // Use a preset of the DateTime module
+        DateTime::date(),
+        // Configure DateTime module with custom format and style
+        Box::new(Module::new(
+            DateTime("%H:%M"),
+            Some(Icon::Time),
             Style {
-                fg: Color::Blue,
+                fg: Color::Magenta,
                 bg: Color::Reset,
                 bold: false,
             },
         )),
-        conditional_insert(
-            StyledModule::new(
-                Module::Manual("  LOW BATTERY  "),
-                None,
-                Style {
-                    fg: Color::Black,
-                    bg: Color::Red,
-                    bold: true,
-                },
-            ),
-            battery_percentage.unwrap_or(100) < 20 && !is_charging,
-        ),
     ]
-    .into_iter()
-    .flatten()
-    .collect()
 }
 
+/// Returns the string to be displayed before all modules
 pub fn pre_modules() -> &'static str {
     ""
 }
 
+/// Returns the string to be displayed after all modules
 pub fn post_modules() -> &'static str {
     " "
 }
 
+/// Returns the string to be displayed between modules
 pub fn between_modules() -> &'static str {
-    " "
+    "  "
 }
