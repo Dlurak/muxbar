@@ -25,23 +25,24 @@ pub enum Module {
 }
 
 impl Module {
-    fn display(self) -> Result<String, ()> {
+    fn display(self) -> Option<String> {
         match self {
-            Module::Manual(s) => Ok(String::from(s)),
+            Module::Manual(s) => Some(String::from(s)),
             Module::Time(format) => {
                 let now: DateTime<Local> = Local::now();
 
-                Ok(now.format(format).to_string())
+                Some(now.format(format).to_string())
             }
             Module::Battery => {
-                BatteryInformation::new().map(|info| format!("{}%", info.percentages))
+                let info = BatteryInformation::new().ok()??;
+                Some(format!("{}%", info.percentages))
             }
-            Module::SessionName => Ok(String::from("#S")),
-            Module::WindowName => Ok(String::from("#W")),
-            Module::WindowIndex => Ok(String::from("#I")),
-            Module::PaneIndex => Ok(String::from("#P")),
-            Module::Hostname => Ok(String::from("#H")),
-            Module::Cpu(rounding) => Ok(strings::round(cpu::get_total_average(), rounding)),
+            Module::SessionName => Some(String::from("#S")),
+            Module::WindowName => Some(String::from("#W")),
+            Module::WindowIndex => Some(String::from("#I")),
+            Module::PaneIndex => Some(String::from("#P")),
+            Module::Hostname => Some(String::from("#H")),
+            Module::Cpu(rounding) => Some(strings::round(cpu::get_total_average(), rounding)),
             Module::Memory(rounding) => {
                 let mut sys = System::new_with_specifics(
                     RefreshKind::new().with_memory(MemoryRefreshKind::everything()),
@@ -53,13 +54,13 @@ impl Module {
                 let used_memory = sys.used_memory();
 
                 let memory_usage_percent = (used_memory as f64 / total_memory as f64) * 100.0;
-                Ok(strings::round(memory_usage_percent, rounding))
+                Some(strings::round(memory_usage_percent, rounding))
             }
             Module::Uptime => {
                 let uptime = System::uptime();
                 let uptime = Duration::from_secs(uptime);
 
-                Ok(format!("{}", strings::PrettyDuration::new(uptime)))
+                Some(format!("{}", strings::PrettyDuration::new(uptime)))
             }
             Module::Swap(rounding) => {
                 let mut sys = System::new_with_specifics(
@@ -72,7 +73,7 @@ impl Module {
                 let used_swap = sys.used_swap();
 
                 let swap_usage_percent = (used_swap as f64 / total_swap as f64) * 100.0;
-                Ok(strings::round(swap_usage_percent, rounding))
+                Some(strings::round(swap_usage_percent, rounding))
             }
         }
     }

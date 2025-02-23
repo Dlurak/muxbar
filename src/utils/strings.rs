@@ -41,13 +41,7 @@ impl PrettyDuration {
             (self.seconds, "S"),
         ]
         .iter()
-        .filter_map(|&(value, unit)| {
-            if value > 0 {
-                Some(format!("{}{}", value, unit))
-            } else {
-                None
-            }
-        })
+        .filter_map(|&(value, unit)| (value > 0).then_some(format!("{}{}", value, unit)))
         .collect()
     }
 }
@@ -55,13 +49,11 @@ impl PrettyDuration {
 impl Display for PrettyDuration {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let parts = self.to_parts();
-        let output = match parts.len() {
-            0 => "0 S".to_string(),
-            1 => parts[0].clone(),
-            _ => format!("{} {}", parts[0], parts[1]),
-        };
-
-        write!(f, "{}", output)
+        match parts.len() {
+            0 => write!(f, "0S"),
+            1 => write!(f, "{}", parts[0]),
+            _ => write!(f, "{} {}", parts[0], parts[1]),
+        }
     }
 }
 

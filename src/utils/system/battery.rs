@@ -7,9 +7,13 @@ pub struct BatteryInformation {
 }
 
 impl BatteryInformation {
-    pub fn new() -> Result<Self, ()> {
+    pub fn new() -> Result<Option<Self>, ()> {
         let mut batteries = Manager::new().and_then(|m| m.batteries()).map_err(|_| ())?;
-        let battery = batteries.next().ok_or(())?.map_err(|_| ())?;
+        let battery = match batteries.next() {
+            Some(Ok(bat)) => bat,
+            Some(Err(_)) => return Err(()),
+            None => return Ok(None),
+        };
 
         let percentages = battery
             .state_of_charge()
@@ -17,9 +21,9 @@ impl BatteryInformation {
 
         let is_charging = battery.state() != State::Discharging;
 
-        Ok(Self {
+        Ok(Some(Self {
             percentages,
             is_charging,
-        })
+        }))
     }
 }

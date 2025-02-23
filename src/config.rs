@@ -1,15 +1,14 @@
 use crate::colors::{Color, Style};
 use crate::icons::Icon;
 use crate::modules::{styled::StyledModule, Module};
-use crate::utils::conditional_insert::conditional_insert;
 use crate::utils::system::battery::BatteryInformation;
 
 pub fn get_modules() -> Vec<StyledModule> {
-    let battery_information = BatteryInformation::new();
+    let battery_information = BatteryInformation::new().ok().flatten();
     let battery_percentage = battery_information.map(|x| x.percentages);
     let is_charging = battery_information.map(|x| x.is_charging).unwrap_or(true);
 
-    let battery_icon = Icon::new_battery(&battery_information);
+    let battery_icon = battery_information.map(Icon::new_battery);
 
     vec![
         Some(StyledModule::new(
@@ -57,7 +56,7 @@ pub fn get_modules() -> Vec<StyledModule> {
                 bold: false,
             },
         )),
-        conditional_insert(
+        (battery_percentage.unwrap_or(100) < 20 && !is_charging).then(|| {
             StyledModule::new(
                 Module::Manual("  LOW BATTERY  "),
                 None,
@@ -66,9 +65,8 @@ pub fn get_modules() -> Vec<StyledModule> {
                     bg: Color::Red,
                     bold: true,
                 },
-            ),
-            battery_percentage.unwrap_or(100) < 20 && !is_charging,
-        ),
+            )
+        }),
     ]
     .into_iter()
     .flatten()

@@ -5,7 +5,7 @@ use std::fmt;
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub enum Icon {
-    Manual(&'static str),
+    Manual(char),
     Time,
     Hyprland,
     I3,
@@ -20,16 +20,21 @@ pub enum Icon {
     Tmux,
 }
 
+impl From<char> for Icon {
+    fn from(value: char) -> Self {
+        Self::Manual(value)
+    }
+}
+
 impl Icon {
-    pub fn new_battery(information: &Result<BatteryInformation, ()>) -> Option<Self> {
-        let info = information.ok()?;
+    pub fn new_battery(info: BatteryInformation) -> Self {
         let perc = info.percentages;
         let charging = info.is_charging;
 
         if charging {
-            Some(Icon::BatteryCharging(perc))
+            Icon::BatteryCharging(perc)
         } else {
-            Some(Icon::Battery(perc))
+            Icon::Battery(perc)
         }
     }
 }

@@ -18,11 +18,11 @@ impl StyledModule {
         }
     }
 
-    pub fn display(&self) -> Result<String, ()> {
+    pub fn display(&self) -> Option<String> {
         let content = self.module.display()?;
 
         if let Some(icon) = self.icon {
-            Ok(format!(
+            Some(format!(
                 "{}{} {}{}",
                 self.style.display(),
                 icon,
@@ -30,7 +30,7 @@ impl StyledModule {
                 colors::Style::default().display()
             ))
         } else {
-            Ok(format!(
+            Some(format!(
                 "{}{}{}",
                 self.style.display(),
                 content,

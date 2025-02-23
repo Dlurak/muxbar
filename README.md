@@ -7,8 +7,8 @@ Tmux status line configured in Rust.
 - Fully configured in Rust
   - Type-save configuration
   - Can be programmed (e.g. dynamically rendered modules)
-- Supports coloring
-- Multithreaded
+- Supports formatting
+- Modules are evaluated parallel
 
 ## Installation
 
