@@ -1,8 +1,4 @@
-mod colors;
 mod config;
-mod icons;
-mod modules;
-mod utils;
 
 use rayon::prelude::*;
 
@@ -11,14 +7,9 @@ fn main() {
 
     let parts: Vec<_> = modules
         .par_iter()
-        .flat_map(|styled_mod| styled_mod.display())
+        .map(|styled_mod| styled_mod.to_string())
         .collect();
-    let content = parts.join(config::between_modules());
+    let content = parts.join(config::BETWEEN_MODULES);
 
-    println!(
-        "{}{}{}",
-        config::pre_modules(),
-        content,
-        config::post_modules(),
-    );
+    println!("{}{}{}", config::PRE_MODULES, content, config::POST_MODULES,);
 }

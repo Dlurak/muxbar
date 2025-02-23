@@ -1,14 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 use std::time::Duration;
 
-pub fn round<T, U>(num: T, decimal_places: U) -> String
-where
-    T: Display,
-    U: Into<usize>,
-{
-    format!("{:.1$}%", num, decimal_places.into())
-}
-
 pub struct PrettyDuration {
     days: u64,
     hours: u64,
@@ -17,7 +9,7 @@ pub struct PrettyDuration {
 }
 
 impl PrettyDuration {
-    pub fn new(duration: Duration) -> Self {
+    pub const fn new(duration: Duration) -> Self {
         let total_seconds = duration.as_secs();
 
         let days = total_seconds / (3600 * 24);
