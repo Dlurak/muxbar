@@ -3,36 +3,29 @@ use crate::{
     colors::{Color, Style},
     icons::Icon,
 };
-use std::{fmt, thread};
+use std::{
+    fmt,
+    time::{Duration, Instant},
+};
 use sysinfo::{CpuRefreshKind, RefreshKind, System};
 
 pub struct Cpu {
     usage: f32,
     minimum_digits: usize,
     decimal_places: usize,
+    system: System,
 }
 
 impl Cpu {
     pub fn new(minimum_digits: usize, decimal_places: usize) -> Self {
+        let specifics = RefreshKind::new().with_cpu(CpuRefreshKind::everything());
+        let system = System::new_with_specifics(specifics);
         Self {
-            usage: Self::total_average(),
+            usage: 0.0,
             minimum_digits,
             decimal_places,
+            system,
         }
-    }
-
-    fn total_average() -> f32 {
-        let mut s =
-            System::new_with_specifics(RefreshKind::new().with_cpu(CpuRefreshKind::everything()));
-
-        thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        s.refresh_cpu();
-
-        let cpus = s.cpus();
-
-        let cpu_sum = cpus.iter().map(|cpu| cpu.cpu_usage()).sum::<f32>();
-
-        cpu_sum / cpus.len() as f32
     }
 }
 
@@ -55,5 +48,19 @@ impl ToModule for Cpu {
 
     fn icon(&self) -> Option<Icon> {
         Some(Icon::Cpu)
+    }
+
+    fn update(&mut self) {
+        let s = &mut self.system;
+
+        s.refresh_cpu();
+
+        let cpus = s.cpus();
+        let cpu_sum = cpus.iter().map(|cpu| cpu.cpu_usage()).sum::<f32>();
+        self.usage = cpu_sum / cpus.len() as f32;
+    }
+
+    fn next_render_time(&self) -> Option<Instant> {
+        Some(Instant::now() + Duration::from_secs_f32(2.5))
     }
 }

@@ -4,8 +4,12 @@ use crate::{
     icons::Icon,
 };
 use chrono::Local;
-use std::fmt;
+use std::{
+    fmt,
+    time::{Duration, Instant},
+};
 
+#[derive(Clone, Copy)]
 pub struct DateTime<'a> {
     format: &'a str,
 }
@@ -36,5 +40,9 @@ impl ToModule for DateTime<'_> {
     }
     fn style(&self) -> Style {
         Style::new_with_fg(Color::Magenta)
+    }
+    fn next_render_time(&self) -> Option<Instant> {
+        // TODO: Calculate the actual needed instant
+        Some(Instant::now() + Duration::from_secs(1))
     }
 }

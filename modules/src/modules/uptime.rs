@@ -1,31 +1,32 @@
-use sysinfo::System;
-
 use super::ToModule;
 use crate::{
     colors::{Color, Style},
     icons::Icon,
     pretty_duration::PrettyDuration,
 };
-use std::{fmt, time::Duration};
+use std::{
+    fmt,
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
+};
+use sysinfo::System;
 
-pub struct Uptime(Duration);
-
-impl Uptime {
-    pub fn new() -> Self {
-        let duration = Duration::from_secs(System::uptime());
-        Self(duration)
-    }
+pub struct Uptime {
+    boot_time: SystemTime,
+    uptime: PrettyDuration,
 }
 
-impl Default for Uptime {
-    fn default() -> Self {
-        Self::new()
+impl Uptime {
+    pub fn new() -> Option<Self> {
+        let boot_time = UNIX_EPOCH + Duration::from_secs(System::boot_time());
+        let uptime = boot_time.elapsed().ok()?;
+        let uptime = PrettyDuration::new(uptime);
+        Some(Self { boot_time, uptime })
     }
 }
 
 impl fmt::Display for Uptime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", PrettyDuration::new(self.0))
+        write!(f, "{}", self.uptime)
     }
 }
 
@@ -35,5 +36,15 @@ impl ToModule for Uptime {
     }
     fn style(&self) -> Style {
         Style::new_with_fg(Color::Yellow)
+    }
+    fn update(&mut self) {
+        if let Ok(uptime) = self.boot_time.elapsed() {
+            self.uptime = PrettyDuration::new(uptime)
+        }
+    }
+    fn next_render_time(&self) -> Option<Instant> {
+        // TODO: Calculate the actual duration
+        let duration = Duration::from_secs(5);
+        Some(Instant::now() + duration)
     }
 }

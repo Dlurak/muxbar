@@ -1,11 +1,31 @@
-use std::fmt::{Display, Formatter, Result};
+use std::fmt::{self, Display, Formatter, Result};
 use std::time::Duration;
 
 pub struct PrettyDuration {
-    days: u64,
-    hours: u64,
-    minutes: u64,
-    seconds: u64,
+    pub days: u64,
+    pub hours: u64,
+    pub minutes: u64,
+    pub seconds: u64,
+}
+
+#[derive(Clone, Copy)]
+enum Unit {
+    Day,
+    Hour,
+    Minute,
+    Second,
+}
+
+impl fmt::Display for Unit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        let s = match self {
+            Self::Day => "D",
+            Self::Hour => "H",
+            Self::Minute => "M",
+            Self::Second => "S",
+        };
+        write!(f, "{s}")
+    }
 }
 
 impl PrettyDuration {
@@ -25,15 +45,15 @@ impl PrettyDuration {
         }
     }
 
-    fn to_parts(&self) -> Vec<String> {
-        [
-            (self.days, "D"),
-            (self.hours, "H"),
-            (self.minutes, "M"),
-            (self.seconds, "S"),
+    fn to_parts(&self) -> Vec<(u64, Unit)> {
+        vec![
+            (self.days, Unit::Day),
+            (self.hours, Unit::Hour),
+            (self.minutes, Unit::Minute),
+            (self.seconds, Unit::Second),
         ]
-        .iter()
-        .filter_map(|&(value, unit)| (value > 0).then_some(format!("{}{}", value, unit)))
+        .into_iter()
+        .filter(|(value, _)| (*value > 0))
         .collect()
     }
 }
@@ -43,8 +63,12 @@ impl Display for PrettyDuration {
         let parts = self.to_parts();
         match parts.len() {
             0 => write!(f, "0S"),
-            1 => write!(f, "{}", parts[0]),
-            _ => write!(f, "{} {}", parts[0], parts[1]),
+            1 => write!(f, "{}{}", parts[0].0, parts[0].1),
+            _ => write!(
+                f,
+                "{}{} {}{}",
+                parts[0].0, parts[0].1, parts[1].0, parts[1].1
+            ),
         }
     }
 }
@@ -90,6 +114,6 @@ mod tests {
         let duration = Duration::new(0, 0); // 0 seconds
         let pretty_duration = PrettyDuration::new(duration);
 
-        assert_eq!(pretty_duration.to_string(), "0 S");
+        assert_eq!(pretty_duration.to_string(), "0S");
     }
 }

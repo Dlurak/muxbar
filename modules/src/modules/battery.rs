@@ -4,13 +4,16 @@ use crate::{
     icons::Icon,
 };
 use battery::{units, Manager, State};
-use std::fmt;
+use std::{
+    fmt,
+    time::{Duration, Instant},
+};
 
-#[derive(Clone, Copy)]
 pub struct Battery {
-    pub percentage: u8,
-    pub is_charging: bool,
+    percentage: u8,
+    is_charging: bool,
     minimum_digits: usize,
+    manager: Manager,
 }
 
 impl fmt::Display for Battery {
@@ -38,11 +41,33 @@ impl ToModule for Battery {
             Some(Icon::Battery(perc))
         }
     }
+
+    fn update(&mut self) {
+        let battery = self
+            .manager
+            .batteries()
+            .ok()
+            .map(|mut batteries| batteries.next())
+            .flatten()
+            .and_then(|b| b.ok());
+
+        if let Some(battery) = battery {
+            self.percentage = battery.state_of_charge().get::<units::ratio::percent>() as u8;
+            self.is_charging = battery.state() != State::Discharging;
+        }
+    }
+
+    fn next_render_time(&self) -> Option<Instant> {
+        let percentage: f32 = self.percentage.into();
+        let secs = percentage.sqrt();
+        Some(Instant::now() + Duration::from_secs_f32(secs))
+    }
 }
 
 impl Battery {
     pub fn try_new(minimum_digits: usize) -> Result<Option<Self>, battery::errors::Error> {
-        let mut batteries = Manager::new()?.batteries()?;
+        let manager = Manager::new()?;
+        let mut batteries = manager.batteries()?;
         let battery = match batteries.next() {
             Some(val) => val,
             None => return Ok(None),
@@ -56,6 +81,7 @@ impl Battery {
             percentage,
             is_charging,
             minimum_digits,
+            manager,
         }))
     }
 }

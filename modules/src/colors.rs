@@ -1,5 +1,5 @@
 /// Color of a Module
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Hash)]
 pub enum Color {
     Black,
     White,
@@ -34,7 +34,7 @@ impl Color {
     }
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Hash)]
 pub struct Style {
     pub fg: Color,
     pub bg: Color,

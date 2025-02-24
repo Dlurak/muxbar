@@ -1,9 +1,7 @@
 use modules::modules::{Battery, Cpu, DateTime, Memory, TmuxContent, Warning};
-use modules::{Color, Icon, Module, Style};
-use std::fmt;
+use modules::{modules::ToModule, Color, Icon, Module, Style};
 
-pub fn get_modules() -> Vec<Module<Box<dyn fmt::Display + Sync>>> {
-    let battery = Battery::try_new(2).ok().flatten();
+pub fn get_modules() -> Vec<Module<Box<dyn ToModule>>> {
     [
         Some(
             Module::from(DateTime::date())
@@ -12,11 +10,12 @@ pub fn get_modules() -> Vec<Module<Box<dyn fmt::Display + Sync>>> {
         ),
         Some(DateTime::new("%H:%M:%S").into()),
         Some(Cpu::new(2, 2).into()),
-        battery.map(|x| x.into()),
+        Battery::try_new(2).ok().flatten().map(|x| x.into()),
         Some(Memory::new(2, 2).into()),
         Some(TmuxContent::SessionName.into()),
-        battery
-            .and_then(|bat| Warning::from_battery(&bat, 20))
+        Warning::new_battery(20, 20.0)
+            .ok()
+            .flatten()
             .map(|x| x.into()),
     ]
     .into_iter()

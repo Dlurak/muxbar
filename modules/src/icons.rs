@@ -1,7 +1,7 @@
 use std::fmt;
 
 // Those are only constructed in config.rs
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Hash)]
 pub enum Icon {
     Manual(char),
     Time,
