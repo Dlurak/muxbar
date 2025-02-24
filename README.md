@@ -8,7 +8,10 @@ Tmux status line configured in Rust.
   - Type-save configuration
   - Can be programmed (e.g. dynamically rendered modules)
 - Supports formatting
-- Modules are evaluated parallel
+- Cached modules
+    - Each module specifies when it needs to recompute and also how to update it self.
+    - Once a module needs to recompute that specific module is updated
+    - All other modules are cached
 
 ## Installation
 
@@ -36,5 +39,4 @@ The configuration is written in Rust and located in `./src/config.rs`
 
 ## Examples
 
-![New Default](./assets/new_default.png)
-![Old Default](./assets/default.png)
+![Default](./assets/default.png)

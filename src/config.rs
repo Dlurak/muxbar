@@ -10,8 +10,8 @@ pub fn get_modules() -> Vec<Module<Box<dyn ToModule>>> {
         ),
         Some(DateTime::new("%H:%M:%S").into()),
         Some(Cpu::new(2, 2).into()),
-        Battery::try_new(2).ok().flatten().map(|x| x.into()),
         Some(Memory::new(2, 2).into()),
+        Battery::try_new(2).ok().flatten().map(|x| x.into()),
         Some(TmuxContent::SessionName.into()),
         Warning::new_battery(20, 20.0)
             .ok()
