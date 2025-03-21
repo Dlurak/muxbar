@@ -6,4 +6,3 @@ edition = "2021"
 [dependencies]
 modules = { path = "modules" }
 itertools = "0.14.0"
-chrono = "0.4.40"

@@ -1,11 +1,9 @@
-use modules::modules::{Battery, Cpu, DateTime, Memory, Text, TmuxContent, Warning};
+use modules::modules::{Battery, Cpu, DateTime, Memory, TmuxContent, Warning};
 use modules::{modules::ToModule, Color, Icon, Module, Style};
 use std::time::Duration;
 
 pub fn get_modules() -> Vec<Module<Box<dyn ToModule>>> {
-    let text = "Muxbar";
     [
-        Text::new(text, 4, '.').map(Into::into),
         Some(
             Module::from(DateTime::date_without_year())
                 .set_icon(Some(Icon::Calendar))

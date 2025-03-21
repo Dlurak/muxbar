@@ -226,7 +226,6 @@ dependencies = [
 name = "muxbar"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "itertools",
  "modules",
 ]
