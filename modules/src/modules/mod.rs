@@ -1,21 +1,16 @@
-mod battery;
-mod cpu;
-mod datetime;
-mod memory;
-mod tmux;
-mod uptime;
-mod warning;
+macro_rules! modules {
+    ($($module:ident),*) => {
+        $(
+            mod $module;
+            pub use $module::*;
+        )*
+    };
+}
 
-pub use battery::*;
-pub use cpu::*;
-pub use datetime::*;
-pub use memory::*;
-pub use tmux::*;
-pub use uptime::*;
-pub use warning::*;
+modules![battery, cpu, datetime, memory, tmux, uptime, warning, text];
 
-use crate::{colors::Style, icons::Icon};
-use std::{fmt, time::Instant};
+use crate::{colors::Style, icons::Icon, outputter::Outputter};
+use std::{fmt, time::Duration};
 
 /// A trait that defines the neccessary methods for items that can be converted into modules. These
 /// are only defaults. The style and icon can be overwritten
@@ -26,7 +21,7 @@ pub trait ToModule: fmt::Display {
     /// Returns an optional icon for the module.
     fn icon(&self) -> Option<Icon>;
 
-    fn next_render_time(&self) -> Option<Instant> {
+    fn next_render_time(&self) -> Option<Duration> {
         None
     }
 
@@ -85,13 +80,6 @@ impl<T: ToModule + Default> Default for Module<T> {
     }
 }
 
-impl<T: fmt::Display> fmt::Display for Module<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let icon = self.icon.0.map(|icon| icon.to_string()).unwrap_or_default();
-        write!(f, "{}{} {}", self.style.0.display(), icon, self.content,)
-    }
-}
-
 impl<T: fmt::Display> Module<T> {
     pub fn new(content: T) -> Self {
         Self {
@@ -99,6 +87,18 @@ impl<T: fmt::Display> Module<T> {
             icon: (None, false),
             style: (Style::default(), false),
         }
+    }
+
+    pub fn output<O: Outputter>(&self, outputter: O) -> String {
+        let icon = self.icon.0.map(|icon| icon.to_string()).unwrap_or_default();
+        let style = self.style.0;
+        format!(
+            "{}{} {}{}",
+            outputter.prefix(style),
+            icon,
+            self.content,
+            outputter.postfix(style).unwrap_or_default()
+        )
     }
 
     pub fn set_icon(self, icon: Option<Icon>) -> Self {

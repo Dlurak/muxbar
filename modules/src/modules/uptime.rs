@@ -6,7 +6,7 @@ use crate::{
 };
 use std::{
     fmt,
-    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use sysinfo::System;
 
@@ -42,9 +42,9 @@ impl ToModule for Uptime {
             self.uptime = PrettyDuration::new(uptime)
         }
     }
-    fn next_render_time(&self) -> Option<Instant> {
+    fn next_render_time(&self) -> Option<Duration> {
         // TODO: Calculate the actual duration
         let duration = Duration::from_secs(5);
-        Some(Instant::now() + duration)
+        Some(duration)
     }
 }

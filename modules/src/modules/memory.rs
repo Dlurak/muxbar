@@ -3,10 +3,7 @@ use crate::{
     colors::{Color, Style},
     icons::Icon,
 };
-use std::{
-    fmt,
-    time::{Duration, Instant},
-};
+use std::{fmt, time::Duration};
 use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
 pub struct Memory {
@@ -60,7 +57,7 @@ impl ToModule for Memory {
         self.usage = (system.used_memory() as f32 / system.total_memory() as f32) * 100.0;
     }
 
-    fn next_render_time(&self) -> Option<Instant> {
-        Some(Instant::now() + Duration::from_secs_f32(7.5))
+    fn next_render_time(&self) -> Option<Duration> {
+        Some(Duration::from_secs_f32(7.5))
     }
 }

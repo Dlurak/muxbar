@@ -1,4 +1,5 @@
 pub mod modules;
+pub mod outputter;
 mod colors;
 mod icons;
 mod pretty_duration;

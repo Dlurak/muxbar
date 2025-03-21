@@ -3,10 +3,7 @@ use crate::{
     colors::{Color, Style},
     icons::Icon,
 };
-use std::{
-    fmt,
-    time::{Duration, Instant},
-};
+use std::{fmt, time::Duration};
 use sysinfo::{CpuRefreshKind, RefreshKind, System};
 
 pub struct Cpu {
@@ -60,7 +57,7 @@ impl ToModule for Cpu {
         self.usage = cpu_sum / cpus.len() as f32;
     }
 
-    fn next_render_time(&self) -> Option<Instant> {
-        Some(Instant::now() + Duration::from_secs_f32(2.5))
+    fn next_render_time(&self) -> Option<Duration> {
+        Some(Duration::from_secs_f32(2.5))
     }
 }

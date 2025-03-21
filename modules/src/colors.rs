@@ -1,5 +1,5 @@
 /// Color of a Module
-#[derive(Clone, Copy, Default, Hash)]
+#[derive(Clone, Copy, Default, Hash, PartialEq, Eq)]
 pub enum Color {
     Black,
     White,
@@ -16,20 +16,19 @@ pub enum Color {
     Any(&'static str),
 }
 
-impl Color {
-    fn get_tmux_color_code(&self, background: bool) -> String {
-        let prefix = if background { "bg" } else { "fg" };
-        match self {
-            Self::White => format!("#[{}=white]", prefix),
-            Self::Black => format!("#[{}=black]", prefix),
-            Self::Red => format!("#[{}=red]", prefix),
-            Self::Green => format!("#[{}=green]", prefix),
-            Self::Yellow => format!("#[{}=yellow]", prefix),
-            Self::Blue => format!("#[{}=blue]", prefix),
-            Self::Cyan => format!("#[{}=cyan]", prefix),
-            Self::Magenta => format!("#[{}=magenta]", prefix),
-            Self::Reset => format!("#[{}=default]", prefix),
-            Self::Any(color) => format!("#[{}={}]", prefix, color),
+impl TryFrom<Color> for ansi_term::Colour {
+    type Error = ();
+    fn try_from(value: Color) -> Result<Self, Self::Error> {
+        match value {
+            Color::Black => Ok(Self::Black),
+            Color::White => Ok(Self::White),
+            Color::Red => Ok(Self::Red),
+            Color::Green => Ok(Self::Green),
+            Color::Yellow => Ok(Self::Yellow),
+            Color::Blue => Ok(Self::Blue),
+            Color::Cyan => Ok(Self::Cyan),
+            Color::Magenta => Ok(Self::Purple),
+            Color::Reset | Color::Any(_) => Err(()),
         }
     }
 }
@@ -46,24 +45,7 @@ impl Style {
         Self {
             fg,
             bg: Color::Reset,
-            bold: false
+            bold: false,
         }
-    }
-
-    pub fn display(self) -> String {
-        format!(
-            "{}{}{}",
-            self.fg.get_tmux_color_code(false),
-            self.bg.get_tmux_color_code(true),
-            bold(self.bold),
-        )
-    }
-}
-
-const fn bold(is_bold: bool) -> &'static str {
-    if is_bold {
-        "#[bold]"
-    } else {
-        "#[nobold]"
     }
 }

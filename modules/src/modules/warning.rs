@@ -2,10 +2,7 @@ use crate::{
     colors::{Color, Style},
     icons::Icon,
 };
-use std::{
-    fmt,
-    time::{Duration, Instant},
-};
+use std::{fmt, time::Duration};
 
 use super::ToModule;
 
@@ -15,7 +12,7 @@ pub enum WarningRerender<'a> {
         threshold: u8,
         hourly_percentage_usage: f32,
     },
-    Custom(&'a dyn Fn() -> (bool, Option<Instant>)),
+    Custom(&'a dyn Fn() -> (bool, Option<Duration>)),
 }
 
 pub struct Warning<'a, T: fmt::Display> {
@@ -75,8 +72,7 @@ impl<T: fmt::Display> ToModule for Warning<'_, T> {
                 let battery = manager
                     .batteries()
                     .ok()
-                    .map(|mut batteries| batteries.next())
-                    .flatten()
+                    .and_then(|mut batteries| batteries.next())
                     .and_then(|b| b.ok());
 
                 battery.is_some_and(|battery| {
@@ -91,7 +87,7 @@ impl<T: fmt::Display> ToModule for Warning<'_, T> {
         }
     }
 
-    fn next_render_time(&self) -> Option<Instant> {
+    fn next_render_time(&self) -> Option<Duration> {
         match &self.rerender {
             WarningRerender::Battery {
                 manager,
@@ -106,16 +102,13 @@ impl<T: fmt::Display> ToModule for Warning<'_, T> {
                 let is_discharging = battery.state() == battery::State::Discharging;
 
                 let perc_until_warn = percentage.checked_sub(*threshold);
-                let duration = match perc_until_warn {
-                    Some(perc) => {
-                        let factor = if is_discharging { 3.0 / 5.0 } else { 3.0 / 4.0 };
-                        let hours = (perc as f32) / hourly_percentage_usage * factor;
-                        let secs = hours * 60.0 * 60.0;
-                        Duration::from_secs_f32(secs).max(Duration::from_secs(4))
-                    }
-                    None => Duration::from_secs(4),
-                };
-                Some(Instant::now() + duration)
+                let duration = perc_until_warn.map_or(Duration::from_secs(4), |perc| {
+                    let factor = if is_discharging { 3.0 / 6.0 } else { 3.0 / 4.0 };
+                    let hours = (perc as f32) / hourly_percentage_usage * factor;
+                    let secs = hours * 60.0 * 60.0;
+                    Duration::from_secs_f32(secs).max(Duration::from_secs(4))
+                });
+                Some(duration)
             }
             WarningRerender::Custom(pred) => pred().1,
         }

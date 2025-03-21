@@ -4,10 +4,7 @@ use crate::{
     icons::Icon,
 };
 use battery::{units, Manager, State};
-use std::{
-    fmt,
-    time::{Duration, Instant},
-};
+use std::{fmt, time::Duration};
 
 pub struct Battery {
     percentage: u8,
@@ -47,8 +44,7 @@ impl ToModule for Battery {
             .manager
             .batteries()
             .ok()
-            .map(|mut batteries| batteries.next())
-            .flatten()
+            .and_then(|mut batteries| batteries.next())
             .and_then(|b| b.ok());
 
         if let Some(battery) = battery {
@@ -57,10 +53,10 @@ impl ToModule for Battery {
         }
     }
 
-    fn next_render_time(&self) -> Option<Instant> {
+    fn next_render_time(&self) -> Option<Duration> {
         let percentage: f32 = self.percentage.into();
         let secs = percentage.sqrt();
-        Some(Instant::now() + Duration::from_secs_f32(secs))
+        Some(Duration::from_secs_f32(secs))
     }
 }
 
