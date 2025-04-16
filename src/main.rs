@@ -3,7 +3,7 @@ mod config;
 use itertools::Itertools;
 use modules::{
     modules::ToModule,
-    outputter::{self, Outputter},
+    outputter::{self, Outputter, TmuxOutputter, TtyOutputter},
     Module, Style,
 };
 use std::{
@@ -23,17 +23,12 @@ struct CacheEntry<'a> {
 
 struct Cache<'a>(Vec<CacheEntry<'a>>);
 
-#[cfg(not(debug_assertions))]
-const OUTPUTTER: outputter::TmuxOutputter = outputter::TmuxOutputter;
-#[cfg(debug_assertions)]
-const OUTPUTTER: outputter::TtyOutputter = outputter::TtyOutputter;
-
 impl<'a> Cache<'a> {
     fn new(entries: Vec<CacheEntry<'a>>) -> Self {
         Self(entries)
     }
 
-    fn update(self) -> (Self, bool) {
+    fn update(self, outputter: &dyn Outputter) -> (Self, bool) {
         let now = Instant::now();
         let mut rerender = false;
 
@@ -55,7 +50,7 @@ impl<'a> Cache<'a> {
                         .module
                         .internal_set_mut_style(entry.module.content.style());
                     entry.rerender_interval = entry.module.content.next_render_time();
-                    entry.cached_str = entry.module.output(OUTPUTTER);
+                    entry.cached_str = entry.module.output(outputter);
                     entry.include = entry.module.content.include();
                 }
                 entry
@@ -77,12 +72,21 @@ impl From<&Cache<'_>> for String {
 }
 
 fn main() {
+    let outputter = std::env::args()
+        .nth(1)
+        .and_then(outputter::new_outputter)
+        .unwrap_or(if cfg!(debug_assertions) {
+            &TtyOutputter
+        } else {
+            &TmuxOutputter
+        });
+
     let mods = config::get_modules();
     let cached_modules: Vec<_> = mods
         .iter()
         .map(|module| {
             (
-                module.output(OUTPUTTER),
+                module.output(outputter),
                 module.content.next_render_time(),
                 module.content.include(),
             )
@@ -109,7 +113,7 @@ fn main() {
     loop {
         let now = Instant::now();
 
-        let updated = cache.update();
+        let updated = cache.update(outputter);
         cache = updated.0;
 
         if updated.1 || !first_render {
@@ -119,7 +123,7 @@ fn main() {
                 config::PRE_MODULES,
                 String::from(&cache),
                 config::POST_MODULES,
-                OUTPUTTER.prefix(Style::default())
+                outputter.prefix(Style::default())
             );
         }
 
