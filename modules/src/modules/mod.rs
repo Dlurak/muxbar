@@ -89,7 +89,7 @@ impl<T: fmt::Display> Module<T> {
         }
     }
 
-    pub fn output<O: Outputter>(&self, outputter: O) -> String {
+    pub fn output(&self, outputter: &dyn Outputter) -> String {
         let icon = self.icon.0.map(|icon| icon.to_string()).unwrap_or_default();
         let style = self.style.0;
         format!(

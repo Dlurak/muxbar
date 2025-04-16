@@ -1,3 +1,5 @@
+// TODO: Should they stay as independent structs or be one enum?
+
 use crate::{Color, Style};
 
 pub trait Outputter {
@@ -58,5 +60,13 @@ impl Outputter for TtyOutputter {
         }
 
         ansi_style.prefix().to_string()
+    }
+}
+
+pub fn new_outputter(str: String) -> Option<&'static dyn Outputter> {
+    match str.to_lowercase().as_str() {
+        "tty" | "terminal" | "term" => Some(&TtyOutputter),
+        "tmux" => Some(&TmuxOutputter),
+        _ => None,
     }
 }
