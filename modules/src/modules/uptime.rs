@@ -32,7 +32,7 @@ impl fmt::Display for Uptime {
 
 impl ToModule for Uptime {
     fn icon(&self) -> Option<Icon> {
-        Some(Icon::Time)
+        Some(Icon::Time(self.uptime.hours as usize))
     }
     fn style(&self) -> Style {
         Style::new_with_fg(Color::Yellow)

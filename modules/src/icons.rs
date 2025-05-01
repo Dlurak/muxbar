@@ -4,7 +4,7 @@ use std::fmt;
 #[derive(Clone, Copy, Hash)]
 pub enum Icon {
     Manual(char),
-    Time,
+    Time(usize),
     Calendar,
     Hyprland,
     I3,
@@ -29,7 +29,10 @@ impl fmt::Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Manual(s) => write!(f, "{}", s),
-            Self::Time => write!(f, ""),
+            Self::Time(hour) => {
+                let icons = ['󱑖', '󱑋', '󱑌', '󱑍', '󱑎', '󱑏', '󱑐', '󱑑', '󱑒', '󱑓', '󱑔', '󱑕'];
+                write!(f, "{}", icons[hour % 12])
+            }
             Self::Calendar => write!(f, ""),
             Self::Hyprland => write!(f, ""),
             Self::I3 => write!(f, ""),

@@ -3,7 +3,7 @@ use crate::{
     colors::{Color, Style},
     icons::Icon,
 };
-use chrono::Local;
+use chrono::{Local, Timelike};
 use std::{
     fmt,
     time::Duration
@@ -40,7 +40,8 @@ impl fmt::Display for DateTime<'_> {
 
 impl ToModule for DateTime<'_> {
     fn icon(&self) -> Option<Icon> {
-        Some(Icon::Time)
+        let (_, hour) = Local::now().hour12();
+        Some(Icon::Time(hour as usize))
     }
     fn style(&self) -> Style {
         Style::new_with_fg(Color::Magenta)
