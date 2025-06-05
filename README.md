@@ -24,6 +24,7 @@ Tmux status line configured in Rust.
 2. Install Muxbar
 
    ```bash
+   cd muxbar
    cargo install --path .
    ```
 
